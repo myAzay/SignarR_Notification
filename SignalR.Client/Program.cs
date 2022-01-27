@@ -15,8 +15,8 @@ namespace SignalR.Client
                 .Build();
 
             connection.StartAsync().Wait();
-            connection.InvokeCoreAsync("SendMessage",args:new[] {"Test"});
-            connection.On("ReceiveMessage", (string message) =>
+            connection.InvokeCoreAsync("SendNotification", args:new[] {"Test"});
+            connection.On("ReceiveNotification", (string message) =>
              {
                  Console.WriteLine(message);
              }

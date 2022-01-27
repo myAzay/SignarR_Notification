@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SignalR.Server.Hubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SignalR.Server.Interfaces;
+using SignalR.Server.Services;
 
 namespace SignalR.Server
 {
@@ -18,6 +16,9 @@ namespace SignalR.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+            services.AddControllers();
+            services.AddSwaggerGen();
+            services.AddTransient<INotificationService, NotificationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -29,9 +30,11 @@ namespace SignalR.Server
             }
 
             app.UseRouting();
-            
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SignalR v1"));
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapHub<NotificationHub>("/notificationHub");
             });
         }
