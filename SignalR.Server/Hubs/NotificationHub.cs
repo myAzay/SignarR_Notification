@@ -8,5 +8,9 @@ namespace SignalR.Server.Hubs
 {
     public class NotificationHub : Hub
     {
+        public Task SendMessage(string message)
+        {
+            return Clients.All.SendAsync("ReceiveMessage",message);
+        }
     }
 }
