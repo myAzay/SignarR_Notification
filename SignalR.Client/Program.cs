@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Threading.Tasks;
 
@@ -12,14 +13,24 @@ namespace SignalR.Client
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            Log.Debug("Starting up");
+
             var connection = new HubConnectionBuilder()
                 .WithUrl(BASE_URL_HUB)
-                .ConfigureLogging(logging => {
-                    // Set the log level of signalr stuffs
-                    logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
-                    // Set the logging level for Http Connections:
-                    logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Information);
-                })
+                //.ConfigureLogging(logging => {
+                //    logging.AddConsole();
+                //    logging.SetMinimumLevel(LogLevel.Information);
+                //    logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
+                //    logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Information);
+                //})
+                .WithAutomaticReconnect()
                 .Build();
 
             connection.Closed += Connection_Closed;
@@ -36,6 +47,7 @@ namespace SignalR.Client
 
             Console.Read();
         }
+
         private static Task Connection_Reconnected(string arg)
         {
             Console.WriteLine("Connection Reconnected");
