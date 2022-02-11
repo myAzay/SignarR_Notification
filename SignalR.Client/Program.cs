@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -36,18 +37,19 @@ namespace SignalR.Client
             var configuration = new ConfigurationBuilder()
                 .Build();
             
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "logs/logfile.log");
+            //var path = Path.Combine(Directory.GetCurrentDirectory(), "logs/logfile.log");
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
+                .Enrich.FromLogContext()
+                .WriteTo.File("C:/logs/logfile.txt", rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true, buffered: false)
                 .WriteTo.Console()
-                .WriteTo.File(path, rollingInterval: RollingInterval.Day,
-                    rollOnFileSizeLimit: true, buffered: true)
                 .CreateLogger();
 
             var serviceCollection = new ServiceCollection()
                 .AddLogging(builder => builder.AddSerilog(Log.Logger))
                 .BuildServiceProvider();
-
+            Log.CloseAndFlush();
             return serviceCollection;
         }
     }
