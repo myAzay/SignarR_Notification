@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SignalR.Client
@@ -10,60 +14,41 @@ namespace SignalR.Client
     {
         const string BASE_URL = @"http://localhost:5000";
         const string BASE_URL_HUB = BASE_URL + @"/notificationHub";
+        public static ILogger<Program> _logger;
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var serviceCollection = SetupStaticLogger();
+            var logger = serviceCollection.GetService<ILogger<Program>>();
+            _logger = logger;
+            _logger.LogInformation("Start up");
 
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            var connection = new SignalRConnection(BASE_URL_HUB);
 
-            Log.Debug("Starting up");
+            _logger.LogInformation("Getting connection to Hub...");
+            connection.ConnectionToHub();
+            _logger.LogInformation("Connected to Hub");
 
-            var connection = new HubConnectionBuilder()
-                .WithUrl(BASE_URL_HUB)
-                //.ConfigureLogging(logging => {
-                //    logging.AddConsole();
-                //    logging.SetMinimumLevel(LogLevel.Information);
-                //    logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
-                //    logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Information);
-                //})
-                .WithAutomaticReconnect()
-                .Build();
-
-            connection.Closed += Connection_Closed;
-            connection.Reconnecting += Connection_Reconnecting;
-            connection.Reconnected += Connection_Reconnected;
-
-            connection.StartAsync().Wait();
-            connection.InvokeCoreAsync("SendNotification", args:new[] {"Test"});
-            connection.On("ReceiveNotification", (string message) =>
-             {
-                 Console.WriteLine(message);
-             }
-            );
-
+            connection.TestSignalHub("Test").GetAwaiter().GetResult();
             Console.Read();
         }
-
-        private static Task Connection_Reconnected(string arg)
+        private static ServiceProvider SetupStaticLogger()
         {
-            Console.WriteLine("Connection Reconnected");
-            return Task.CompletedTask;
-        }
+            var configuration = new ConfigurationBuilder()
+                .Build();
+            
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "logs/logfile.log");
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .WriteTo.File(path, rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true, buffered: true)
+                .CreateLogger();
 
-        private static Task Connection_Reconnecting(Exception arg)
-        {
-            Console.WriteLine("Connection Reconnecting");
-            return Task.CompletedTask;
-        }
+            var serviceCollection = new ServiceCollection()
+                .AddLogging(builder => builder.AddSerilog(Log.Logger))
+                .BuildServiceProvider();
 
-        private static Task Connection_Closed(Exception arg)
-        {
-            Console.WriteLine("Connection Closed");
-            return Task.CompletedTask;
+            return serviceCollection;
         }
     }
 }
