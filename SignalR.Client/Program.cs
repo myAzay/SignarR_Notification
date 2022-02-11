@@ -14,7 +14,7 @@ namespace SignalR.Client
     class Program
     {
         const string BASE_URL = @"http://localhost:5000";
-        const string BASE_URL_HUB = BASE_URL + @"/notificationHub";
+        const string BASE_URL_HUB = BASE_URL + @"/loggingHub";
         public static ILogger<Program> _logger;
         static void Main(string[] args)
         {
@@ -29,7 +29,7 @@ namespace SignalR.Client
             connection.ConnectionToHub();
             _logger.LogInformation("Connected to Hub");
 
-            connection.TestSignalHub("Test").GetAwaiter().GetResult();
+            connection.TestSignalHub("Test Info logging").GetAwaiter().GetResult();
             Console.Read();
         }
         private static ServiceProvider SetupStaticLogger()

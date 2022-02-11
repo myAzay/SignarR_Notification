@@ -25,11 +25,26 @@ namespace SignalR.Client
         }
         private void ConfigureHandles()
         {
-            connection.On("ReceiveNotification", (string message) =>
-            {
-                Console.WriteLine(message);
-            }
-           );
+            connection.On("GetInfoLog", (string message) =>
+                {
+                    Program._logger.LogInformation(message);
+                }
+            );
+            connection.On("GetWarningLog", (string message) =>
+                {
+                    Program._logger.LogWarning(message);
+                }
+            );
+            connection.On("GetErrorLog", (Exception exception, string message) =>
+                {
+                    Program._logger.LogError(exception, message);
+                }
+            );
+            connection.On("GetErrorMessageLog", (string message) =>
+                {
+                    Program._logger.LogError(message);
+                }
+            );
         }
         public void ConnectionToHub()
         {
@@ -55,7 +70,7 @@ namespace SignalR.Client
 
         public async Task TestSignalHub(string notification)
         {
-            await connection.InvokeCoreAsync("SendNotification", args: new[] { notification });
+            await connection.InvokeCoreAsync("SendInfoMessage", args: new[] { notification });
         }
         private Task Connection_Closed(Exception arg)
         {

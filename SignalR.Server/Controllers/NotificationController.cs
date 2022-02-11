@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SignalR.Server.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,10 @@ namespace SignalR.Server.Controllers
         }
 
        [HttpGet("sendNotification")]
-       public async Task<IActionResult> SendNotification(string message)
+        [SwaggerOperation(Summary = "Send message throught SignalR",
+            Description = "Send 0 to get error.\n" +
+            "Send 1 to get warning.")]
+        public async Task<IActionResult> SendNotification(string message)
         {
             await _notificationService.SendNotification(message);
             return Ok();

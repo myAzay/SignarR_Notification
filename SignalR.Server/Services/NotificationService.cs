@@ -12,9 +12,9 @@ namespace SignalR.Server.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly IHubContext<NotificationHub, ITypedNotification> _notificationHubContext;
+        private readonly IHubContext<LoggingHub, ITypedLogging> _notificationHubContext;
         private readonly ILogger<NotificationService> _logger;
-        public NotificationService(IHubContext<NotificationHub, ITypedNotification> notificationHubContext,
+        public NotificationService(IHubContext<LoggingHub, ITypedLogging> notificationHubContext,
             ILogger<NotificationService> logger)
         {
             _notificationHubContext = notificationHubContext;
@@ -22,7 +22,18 @@ namespace SignalR.Server.Services
         }
         public Task SendNotification(string message)
         {
-            _logger.Info($"Sending notification with message : {message}", _notificationHubContext);
+            switch (message)
+            {
+                case "1":
+                    _logger.Warning("Warning message", _notificationHubContext);
+                    break;
+                case "0":
+                    _logger.Error("Error message", _notificationHubContext);
+                    break;
+                default:
+                    _logger.Info($"Sending notification with message : {message}", _notificationHubContext);
+                    break;
+            }
             return Task.CompletedTask;
         }
     }

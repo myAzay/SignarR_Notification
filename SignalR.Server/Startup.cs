@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SignalR.Server.Hubs;
 using SignalR.Server.Interfaces;
+using SignalR.Server.Middlewares;
 using SignalR.Server.Services;
 
 namespace SignalR.Server
@@ -15,7 +16,7 @@ namespace SignalR.Server
         {
             services.AddSignalR();
             services.AddControllers();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c => { c.EnableAnnotations(); });
             services.AddTransient<INotificationService, NotificationService>();
         }
 
@@ -29,10 +30,11 @@ namespace SignalR.Server
             app.UseRouting();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SignalR v1"));
+            app.UseMiddleware<AppExceptionMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>("/notificationHub");
+                endpoints.MapHub<LoggingHub>("/loggingHub");
             });
         }
     }
