@@ -11,24 +11,24 @@ namespace SignalR.Server.Hubs
     {
         public Task SendInfoMessage(string message)
         {
-            return Clients.All.GetInfoLog(message);
+            return Clients.Caller.GetInfoLog(message);
         }
         public Task SendWarningMessage(string message)
         {
-            return Clients.All.GetWarningLog(message);
+            return Clients.Caller.GetWarningLog(message);
         }
         public Task SendError(Exception exception, string message)
         {
             var stackTrace = exception.StackTrace;
-            return Clients.All.GetErrorLog(stackTrace, message);
+            return Clients.Caller.GetErrorLog(stackTrace, message);
         }
         public Task SendErrorMessage(string message)
         {
-            return Clients.All.GetErrorMessageLog(message);
+            return Clients.Caller.GetErrorMessageLog(message);
         }
         public Task SendDebugMessage(string message)
         {
-            return Clients.All.GetDebugLog(message);
+            return Clients.Caller.GetDebugLog(message);
         }
         public override Task OnConnectedAsync()
         {
