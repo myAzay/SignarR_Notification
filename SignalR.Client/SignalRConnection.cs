@@ -45,6 +45,11 @@ namespace SignalR.Client
                     Program._logger.LogError(message);
                 }
             );
+            connection.On("GetDebugLog", (string message) =>
+                {
+                    Program._logger.LogDebug(message);
+                }
+            );
         }
         public void ConnectionToHub()
         {
@@ -57,7 +62,7 @@ namespace SignalR.Client
                 }
                 catch (Exception error)
                 {
-                    Program._logger.LogError("Failed to connect to Hub");
+                    Program._logger.LogError(error, "Failed to connect to Hub");
                     ReconnectTriesCountLeft--;
                     ConnectionToHub();
                     connection.StopAsync().GetAwaiter().GetResult();
@@ -82,9 +87,7 @@ namespace SignalR.Client
         {
             Program._logger.LogWarning("Connection to Hub has been lost, reconnecting....");
             ReconnectTriesCountLeft = DEFAULT_RECONNECT_COUNT;
-            //Task.Run(new Action(ConnectionToHub)).GetAwaiter().GetResult();
             ConnectionToHub();
-            //connection.StartAsync().GetAwaiter().GetResult();
             return Task.CompletedTask;
         }
 

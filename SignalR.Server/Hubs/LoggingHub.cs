@@ -25,6 +25,10 @@ namespace SignalR.Server.Hubs
         {
             return Clients.All.GetErrorMessageLog(message);
         }
+        public Task SendDebugMessage(string message)
+        {
+            return Clients.All.GetDebugLog(message);
+        }
         public override Task OnConnectedAsync()
         {
             return base.OnConnectedAsync();

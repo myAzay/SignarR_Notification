@@ -10,6 +10,7 @@ namespace SignalR.Server.Interfaces
         Task GetErrorLog(Exception exception, string message);
         Task GetErrorMessageLog(string message);
         Task GetInfoLog(string message);
+        Task GetDebugLog(string message);
         Task GetWarningLog(string message);
     }
 }
