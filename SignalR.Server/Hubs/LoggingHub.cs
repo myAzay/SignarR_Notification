@@ -19,7 +19,8 @@ namespace SignalR.Server.Hubs
         }
         public Task SendError(Exception exception, string message)
         {
-            return Clients.All.GetErrorLog(exception, message);
+            var stackTrace = exception.StackTrace;
+            return Clients.All.GetErrorLog(stackTrace, message);
         }
         public Task SendErrorMessage(string message)
         {

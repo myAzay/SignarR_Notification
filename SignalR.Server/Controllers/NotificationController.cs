@@ -20,8 +20,9 @@ namespace SignalR.Server.Controllers
 
        [HttpGet("sendNotification")]
         [SwaggerOperation(Summary = "Send message through SignalR",
-            Description = "Send 0 to get error;\r\n" +
-            "Send 1 to get warning.")]
+            Description = "Send 0 to get error message;\r\n" +
+            "Send 1 to get warning;\r\n" +
+            "Send -1 to throw error")]
         public async Task<IActionResult> SendNotification(string message)
         {
             await _notificationService.SendNotification(message);

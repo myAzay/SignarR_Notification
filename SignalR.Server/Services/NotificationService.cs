@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using SignalR.Server.AppExceptions;
 using SignalR.Server.Helper;
 using SignalR.Server.Hubs;
 using SignalR.Server.Interfaces;
@@ -30,6 +31,8 @@ namespace SignalR.Server.Services
                 case "0":
                     _logger.Error("Error message", _notificationHubContext);
                     break;
+                case "-1":
+                    throw new AppException(400, "Error message");
                 default:
                     _logger.Info($"Sending notification with message : {message}", _notificationHubContext);
                     break;

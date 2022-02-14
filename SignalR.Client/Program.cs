@@ -27,7 +27,6 @@ namespace SignalR.Client
 
             _logger.LogInformation("Getting connection to Hub...");
             connection.ConnectionToHub();
-            _logger.LogInformation("Connected to Hub");
 
             connection.TestSignalHub("Test Info logging").GetAwaiter().GetResult();
             Console.Read();
@@ -36,8 +35,7 @@ namespace SignalR.Client
         {
             var configuration = new ConfigurationBuilder()
                 .Build();
-            
-            //var path = Path.Combine(Directory.GetCurrentDirectory(), "logs/logfile.log");
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .Enrich.FromLogContext()

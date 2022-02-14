@@ -22,7 +22,7 @@ namespace SignalR.Server.Helper
                     if (exception is null)
                         context.Clients.All.GetErrorMessageLog(message);
                     else
-                        context.Clients.All.GetErrorLog(exception, message);
+                        context.Clients.All.GetErrorLog(exception.StackTrace, message);
                     break;
                 case LogLevel.Debug:
                     context.Clients.All.GetDebugLog(message);

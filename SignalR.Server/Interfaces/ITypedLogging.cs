@@ -7,7 +7,7 @@ namespace SignalR.Server.Interfaces
 {
     public interface ITypedLogging
     {
-        Task GetErrorLog(Exception exception, string message);
+        Task GetErrorLog(string stackTrace, string message);
         Task GetErrorMessageLog(string message);
         Task GetInfoLog(string message);
         Task GetDebugLog(string message);

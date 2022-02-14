@@ -35,9 +35,9 @@ namespace SignalR.Client
                     Program._logger.LogWarning(message);
                 }
             );
-            connection.On("GetErrorLog", (Exception exception, string message) =>
+            connection.On("GetErrorLog", (string exceptionStack, string message) =>
                 {
-                    Program._logger.LogError(exception, message);
+                    Program._logger.LogError($"{message} {exceptionStack}");
                 }
             );
             connection.On("GetErrorMessageLog", (string message) =>
@@ -53,11 +53,14 @@ namespace SignalR.Client
         }
         public void ConnectionToHub()
         {
+            var isConnected = false;
             while(ReconnectTriesCountLeft > 0)
             {
                 try
                 {
                     connection.StartAsync().Wait();
+                    Program._logger.LogInformation("Connected to Hub");
+                    isConnected = true;
                     break;
                 }
                 catch (Exception error)
@@ -65,6 +68,9 @@ namespace SignalR.Client
                     Program._logger.LogError(error, "Failed to connect to Hub");
                     ReconnectTriesCountLeft--;
                     ConnectionToHub();
+
+                    if (isConnected)
+                        break;
                     connection.StopAsync().GetAwaiter().GetResult();
                     Program._logger.LogCritical("Can't connect to hub");
                     Environment.Exit(-1);
