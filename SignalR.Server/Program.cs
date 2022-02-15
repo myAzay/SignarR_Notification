@@ -20,10 +20,14 @@ namespace SignalR.Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureLogging(config => {
-                        config.ClearProviders();
-                    });
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.SetMinimumLevel(LogLevel.Information);
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                 });
     }
 }

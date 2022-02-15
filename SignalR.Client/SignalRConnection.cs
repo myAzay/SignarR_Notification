@@ -37,7 +37,7 @@ namespace SignalR.Client
             );
             connection.On("GetErrorLog", (string exceptionStack, string message) =>
                 {
-                    Program._logger.LogError($"{message} {exceptionStack}");
+                    Program._logger.LogError($"{message}\r\n{exceptionStack}");
                 }
             );
             connection.On("GetErrorMessageLog", (string message) =>
