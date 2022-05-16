@@ -17,13 +17,10 @@ namespace SignalR.Server.Middlewares
     public class AppExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IHubContext<LoggingHub, ITypedLogging> _notificationHubContext;
-        private readonly ILogger<AppExceptionMiddleware> _logger;
-        public AppExceptionMiddleware(RequestDelegate next, ILogger<AppExceptionMiddleware> logger,
-            IHubContext<LoggingHub, ITypedLogging> notificationHubContext)
+        private readonly ILoggerWrapper<AppExceptionMiddleware> _logger;
+        public AppExceptionMiddleware(RequestDelegate next, ILoggerWrapper<AppExceptionMiddleware> logger)
         {
             _next = next;
-            _notificationHubContext = notificationHubContext;
             _logger = logger;
         }
         
@@ -42,13 +39,13 @@ namespace SignalR.Server.Middlewares
                 switch (error)
                 {
                     case AppException appException:
-                        _logger.Error(error, appException.Message, _notificationHubContext);
+                        _logger.Error(error, appException.Message);
                         response.StatusCode = appException.StatusCode;
                         response.ContentType = appException.ContentType;
                         errorHandler = new ErrorHandler(appException.StatusCode, appException.Message);
                         break;
                     default:
-                        _logger.Error(error, error.Message, _notificationHubContext);
+                        _logger.Error(error, error.Message);
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         errorHandler = new ErrorHandler(response.StatusCode, error.Message);
                         break;
