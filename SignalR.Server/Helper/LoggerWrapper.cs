@@ -22,22 +22,32 @@ namespace SignalR.Server.Helper
 
         private void SendLog(string message, LogLevel logLevel, Exception exception = null)
         {
+            var logMessage = ValidateLogString(message);
             switch (logLevel)
             {
                 case LogLevel.Warning:
-                    _notificationHubContext.Clients.All.GetWarningLog(message);
+                    _logger.LogWarning(logMessage);
+                    _notificationHubContext.Clients.All.GetWarningLog(logMessage);
                     break;
                 case LogLevel.Error:
                     if (exception is null)
-                        _notificationHubContext.Clients.All.GetErrorMessageLog(message);
+                    {
+                        _logger.LogError(logMessage);
+                        _notificationHubContext.Clients.All.GetErrorMessageLog(logMessage);
+                    }
                     else
-                        _notificationHubContext.Clients.All.GetErrorLog(exception.StackTrace, message);
+                    {
+                        _logger.LogError(exception, logMessage);
+                        _notificationHubContext.Clients.All.GetErrorLog(exception.StackTrace, logMessage);
+                    }
                     break;
                 case LogLevel.Debug:
-                    _notificationHubContext.Clients.All.GetDebugLog(message);
+                    _logger.LogDebug(logMessage);
+                    _notificationHubContext.Clients.All.GetDebugLog(logMessage);
                     break;
                 default:
-                    _notificationHubContext.Clients.All.GetInfoLog(message);
+                    _logger.LogInformation(logMessage);
+                    _notificationHubContext.Clients.All.GetInfoLog(logMessage);
                     break;
             }
         }
@@ -47,35 +57,25 @@ namespace SignalR.Server.Helper
         }
         public void Info(string message)
         {
-            var logMessage = ValidateLogString(message);
-            _logger.LogInformation(logMessage);
-            SendLog(logMessage, LogLevel.Info);
+            SendLog(message, LogLevel.Info);
         }
 
         public void Error(string message)
         {
-            var logMessage = ValidateLogString(message);
-            _logger.LogError(logMessage);
-            SendLog(logMessage, LogLevel.Error);
+            SendLog(message, LogLevel.Error);
         }
 
         public void Error(Exception error, string message)
         {
-            var logMessage = ValidateLogString(message);
-            _logger.LogError(error, logMessage);
-            SendLog(logMessage, LogLevel.Error, error);
+            SendLog(message, LogLevel.Error, error);
         }
         public void Warning(string message)
         {
-            var logMessage = ValidateLogString(message);
-            _logger.LogWarning(logMessage);
-            SendLog(logMessage, LogLevel.Warning);
+            SendLog(message, LogLevel.Warning);
         }
         public void Debug(string message)
         {
-            var logMessage = ValidateLogString(message);
-            _logger.LogDebug(logMessage);
-            SendLog(logMessage, LogLevel.Debug);
+            SendLog(message, LogLevel.Debug);
         }
         public IDisposable BeginScope<TState>(TState state)
         {
